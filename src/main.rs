@@ -25,7 +25,7 @@ fn main() {
             socket
         }
         Err(e) => {
-            println!("{}", e);
+            println!("{} {}", "@@@".red(), e);
             return;
         }
     };

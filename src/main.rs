@@ -25,15 +25,15 @@ fn main() {
             socket
         }
         Err(e) => {
-            println!("{} {}", "@@@d".red(), e);
+            println!("{} {}", "@@@".red(), e);
             return;
         }
     };
 
     //Подключаемся к базе данных
     let dsn = "postgresql://test:test@localhost/test_bd";
-    let mut bd_client = match Client::connect(dsn, NoTls) {
-        Ok(bd_client) => {
+    let mut pg_client = match Client::connect(dsn, NoTls) {
+        Ok(pg_client) => {
             println!(
                 "{} {} {} {}",
                 "###".green(),
@@ -41,7 +41,7 @@ fn main() {
                 "Connected to".green(),
                 dsn
             );
-            bd_client
+            pg_client
         }
         Err(e) => {
             let err = format!(
@@ -90,6 +90,16 @@ fn main() {
                 let aw_name = get_value_by_key(&datagram, "aw_name: ");
                 let ip = get_value_by_key(&datagram, "ip: ");
                 println!("\n{}\n{}", aw_name, ip);
+
+                let c = pg_client
+                    .query_one("SELECT * FROM aw", &[])
+                    .expect("failed to query item");
+                
+                let quantity: i32 = c.get("aw_id");
+                let name: String = c.get("aw_name");
+
+                println!("id {} name {}", name, quantity);
+                
             }
 
             //АВ запрашивает код маркировки

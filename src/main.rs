@@ -25,7 +25,7 @@ fn main() {
             socket
         }
         Err(e) => {
-            println!("{} {}", "@@@".red(), e);
+            println!("{} {}", "@@@d".red(), e);
             return;
         }
     };
@@ -81,20 +81,20 @@ fn main() {
 
         //Обрабатываем принятую датаграмму
         //Считываем первую строку сообщения, она должна содержать тип сообщения
-        let message_type = str_between(&datagram, "", "\n");
+        let message_type = get_value_by_key(&datagram, "");
         print!("{} Type: {}", "???".cyan(), message_type);
 
         match message_type {
             //АВ передала свой статус
             "aw_status" => {
-                let aw_name = str_between(&datagram, "aw_name: ", "\n");
-                let ip = str_between(&datagram, "ip: ", "\n");
+                let aw_name = get_value_by_key(&datagram, "aw_name: ");
+                let ip = get_value_by_key(&datagram, "ip: ");
                 println!("\n{}\n{}", aw_name, ip);
             }
 
             //АВ запрашивает код маркировки
             "get_new_mc" => {
-                let gtin = str_between(&datagram, "gtin: ", "\n");
+                let gtin = get_value_by_key(&datagram, "gtin: ");
 
                 //Проверяем корректность запрошенного gtin
                 if gtin.len() == 14 {
@@ -119,13 +119,13 @@ fn main() {
 }
 
 //Выводит значение ключа
-fn str_between<'a>(source: &'a str, start: &'a str, end: &'a str) -> &'a str {
-    let start_position = source.find(start);
+fn get_value_by_key<'a>(source: &'a str, key: &'a str) -> &'a str {
+    let start_position = source.find(key);
 
     if start_position.is_some() {
-        let start_position = start_position.unwrap() + start.len();
+        let start_position = start_position.unwrap() + key.len();
         let source = &source[start_position..];
-        let end_position = source.find(end).unwrap_or_default();
+        let end_position = source.find("\n").unwrap_or_default();
         return &source[..end_position];
     }
     return "";
